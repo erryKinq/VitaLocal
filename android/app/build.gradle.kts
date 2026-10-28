@@ -49,6 +49,15 @@ android {
         buildConfig = true
     }
 
+    // tests expect the German source texts and day boundaries in Berlin, whatever the machine is set to
+    testOptions {
+        unitTests.all {
+            it.systemProperty("user.language", "de")
+            it.systemProperty("user.country", "DE")
+            it.systemProperty("user.timezone", "Europe/Berlin")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
