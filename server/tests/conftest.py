@@ -28,15 +28,27 @@ def engine(settings_env):
     """Fresh, migrated schema in the test database."""
     if not TEST_DB_URL:
         pytest.skip("VITALOCAL_TEST_DATABASE_URL not set")
+    import time
+
+    import psycopg
     from alembic import command
     from alembic.config import Config
     from sqlalchemy import text
+    from sqlalchemy.exc import OperationalError
 
     from vitalocal.db import get_engine
 
     eng = get_engine()
-    with eng.begin() as conn:
-        conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public"))
+    # TimescaleDB's background workers can hold a lock on a hypertable meanwhile: a deadlock, try again
+    for attempt in range(5):
+        try:
+            with eng.begin() as conn:
+                conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public"))
+            break
+        except OperationalError as e:
+            if not isinstance(e.orig, psycopg.errors.DeadlockDetected) or attempt == 4:
+                raise
+            time.sleep(0.5)
     cfg = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
     cfg.set_main_option("script_location", str(Path(__file__).resolve().parents[1] / "alembic"))
     command.upgrade(cfg, "head")
