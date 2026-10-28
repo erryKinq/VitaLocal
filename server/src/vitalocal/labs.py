@@ -99,6 +99,12 @@ GROUPS = (
     ("other", "Sonstige"),
 )
 GROUP_LABELS = dict(GROUPS)
+GROUP_LABELS_EN = {
+    "lipids": "Lipids", "glucose": "Glucose metabolism", "vitamins": "Vitamins",
+    "minerals": "Minerals & trace elements", "iron": "Iron metabolism", "blood_count": "Blood count",
+    "inflammation": "Inflammation", "liver": "Liver & bile", "kidney": "Kidney & uric acid",
+    "electrolytes": "Electrolytes", "thyroid": "Thyroid", "hormones": "Hormones", "other": "Other",
+}  # fmt: skip
 MATERIALS = ("serum", "plasma", "whole_blood", "urine")
 
 
@@ -246,6 +252,34 @@ ANALYTES: tuple[Analyte, ...] = (
        extra_units=("ng/ml",)),
 )  # fmt: skip
 CATALOG: dict[str, Analyte] = {a.key: a for a in ANALYTES}
+# English names where they differ from the German label (own analytes keep the name they were given)
+LABELS_EN = {
+    "cholesterol": "Total cholesterol", "hdl": "HDL cholesterol", "ldl": "LDL cholesterol",
+    "non_hdl": "Non-HDL cholesterol", "triglycerides": "Triglycerides", "glucose": "Glucose",
+    "folate": "Folate", "homocysteine": "Homocysteine", "omega3_index": "Omega-3 index",
+    "magnesium": "Magnesium (serum)", "magnesium_wb": "Magnesium (whole blood)", "zinc": "Zinc",
+    "zinc_wb": "Zinc (whole blood)", "selenium": "Selenium", "selenium_wb": "Selenium (whole blood)",
+    "copper": "Copper", "iron": "Iron", "transferrin_sat": "Transferrin saturation",
+    "stfr": "Soluble transferrin receptor", "hemoglobin": "Haemoglobin", "hematocrit": "Haematocrit",
+    "erythrocytes": "Red blood cells", "leukocytes": "White blood cells", "platelets": "Platelets",
+    "neutrophils_pct": "Neutrophils (%)", "neutrophils_abs": "Neutrophils (absolute)",
+    "lymphocytes_pct": "Lymphocytes (%)", "lymphocytes_abs": "Lymphocytes (absolute)",
+    "monocytes_pct": "Monocytes (%)", "monocytes_abs": "Monocytes (absolute)",
+    "eosinophils_pct": "Eosinophils (%)", "eosinophils_abs": "Eosinophils (absolute)",
+    "basophils_pct": "Basophils (%)", "basophils_abs": "Basophils (absolute)", "hscrp": "hs-CRP",
+    "ggt": "Gamma-GT", "alp": "Alkaline phosphatase", "bilirubin": "Total bilirubin",
+    "total_protein": "Total protein", "ck": "Creatine kinase (CK)", "creatinine": "Creatinine",
+    "urea": "Urea", "uric_acid": "Uric acid", "sodium": "Sodium", "potassium": "Potassium",
+    "chloride": "Chloride", "phosphate": "Phosphate", "testosterone": "Testosterone",
+}  # fmt: skip
+
+
+def label(a: Analyte, lang: str = "de") -> str:
+    return LABELS_EN.get(a.key, a.label) if lang == "en" and not a.custom else a.label
+
+
+def group_labels(lang: str = "de") -> dict[str, str]:
+    return GROUP_LABELS_EN if lang == "en" else GROUP_LABELS
 assert len(CATALOG) == len(ANALYTES), "duplicate analyte key"
 
 

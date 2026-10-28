@@ -195,8 +195,12 @@ def muscles(lang: str = "de") -> dict[str, str]:
     return MUSCLES_EN if lang == "en" else MUSCLES
 
 
+def group_labels(lang: str = "de") -> dict[str, str]:
+    return GROUP_LABELS_EN if lang == "en" else GROUP_LABELS
+
+
 def groups(lang: str = "de") -> list[dict]:
-    labels = GROUP_LABELS_EN if lang == "en" else GROUP_LABELS
+    labels = group_labels(lang)
     return [{"key": g, "label": labels[g], "muscles": list(ms)} for g, ms in MUSCLE_GROUPS.items()]
 
 
@@ -811,6 +815,12 @@ PATTERN_LABELS: dict[str, str] = {
     "biceps": "Bizeps", "triceps": "Trizeps", "delts_front": "vordere Schulter",
     "delts_rear": "hintere Schulter",
 }  # fmt: skip
+PATTERN_LABELS_EN: dict[str, str] = {
+    "h_push": "Horizontal push", "h_pull": "Horizontal pull", "v_push": "Vertical push",
+    "v_pull": "Vertical pull", "knee": "Knee dominant (squat, lunge)",
+    "hip": "Hip dominant (deadlift, hip thrust, leg curl)", "push": "Push", "pull": "Pull",
+    "biceps": "Biceps", "triceps": "Triceps", "delts_front": "Front delts", "delts_rear": "Rear delts",
+}  # fmt: skip
 # (key, side a, side b, lowest a/b, highest a/b): weekly work sets; biceps, triceps and the delts are
 # hard sets (the front delts get more from all the pressing, up to twice the rear delts' sets is fine)
 VOLUME_PAIRS = [
@@ -832,7 +842,7 @@ STRENGTH_PAIRS = [
 ]
 
 
-def balance(sets_per_week: dict[str, float], best_e1rm: dict[str, float]) -> dict:
+def balance(sets_per_week: dict[str, float], best_e1rm: dict[str, float], lang: str = "de") -> dict:
     """Ratios of opposing patterns. `state`: ok, low (a falls short of b), high (a outweighs b) or
     missing (one side has no data)."""
 
@@ -859,4 +869,5 @@ def balance(sets_per_week: dict[str, float], best_e1rm: dict[str, float]) -> dic
             "range": [round(ref - tol, 2), round(ref + tol, 2)],
             "state": state(ratio, ref - tol, ref + tol) if ratio is not None else "missing",
         })  # fmt: skip
-    return {"volume": volume, "strength": strength, "labels": PATTERN_LABELS}
+    labels = PATTERN_LABELS_EN if lang == "en" else PATTERN_LABELS
+    return {"volume": volume, "strength": strength, "labels": labels}

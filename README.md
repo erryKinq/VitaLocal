@@ -7,6 +7,27 @@ logging on the go. Works without a watch and without AI; both are optional.
 > **Not medical advice.** VitaLocal shows and estimates values from your data. Estimates, AI texts
 > and lab status can be wrong; talk to a doctor about health questions.
 
+## Screenshots
+
+All values are invented demo data (`tools/demo_data.py`, see [Development](#development)).
+
+<p align="center"><img src="docs/images/web-overview.png" alt="Overview: drinks, habits, supplements and the habit garden" width="100%"></p>
+
+| | |
+|---|---|
+| ![Sleep: stages and overnight HRV](docs/images/web-sleep.png) | ![Nutrition: food diary with goals and energy balance](docs/images/web-nutrition.png) |
+| Sleep stages and overnight HRV from the watch | Food diary against your goals, energy balance |
+| ![Training: next workout with progression and readiness](docs/images/web-training.png) | ![Muscle map: hard sets per muscle](docs/images/web-muscles.png) |
+| Next workout with double progression, training readiness | Muscle map: recovery, volume, untrained muscles |
+| ![Habits: flames, levels and today's habits](docs/images/web-habits.png) | ![Lab results with lab reference and status](docs/images/web-labs.png) |
+| Habits, automatic ones from your data | Lab results, SI or conventional units |
+| ![Statistics: sleep score over 30 days](docs/images/web-stats.png) | ![Overview in dark mode](docs/images/web-overview-dark.png) |
+| Statistics with a 7-day mean | Dark mode |
+
+**Android app** – logging on the go and a short overview; the details stay in the WebUI:
+
+![Android app: overview, nutrition, habits, training and journal](docs/images/app.png)
+
 ## What you need
 
 - A machine that runs Docker (a NAS, a mini PC, a VPS, …).
@@ -238,6 +259,11 @@ uv run pytest -m "not db"                         # pure unit tests
 VITALOCAL_TEST_DATABASE_URL=postgresql+psycopg://user@host:5432/vitalocal_test uv run pytest
 uv run python -m vitalocal.cli import ../data/Gadgetbridge.zip
 ```
+
+**Demo data:** `python3 tools/demo_data.py --url http://localhost:8000 --token "$VITALOCAL_API_TOKEN"`
+fills an **empty** instance with four weeks of invented data: a synthetic Gadgetbridge export (heart
+rate, steps, sleep, stress, HRV, runs) through the normal import, plus food, drinks, weight, habits,
+supplements, workouts, journal and one lab report through the API (Python 3.9+, stdlib only).
 
 `db` tests **wipe** the schema of the given test database. `realdata` tests use
 `data/Gadgetbridge.zip` (gitignored, never commit it) and are skipped if it is missing.

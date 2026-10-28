@@ -1701,6 +1701,7 @@ def stats(
     heaviest load first, then longest). The progression series may cover a longer range
     (`progress_weeks`) than the weekly hard sets."""
     tz = _tz()
+    lang = profile.lang(conn)
     end = until or datetime.now(tz).date()
     start = _week(end) - timedelta(weeks=weeks - 1)
     p_start = _week(end) - timedelta(weeks=max(progress_weeks or weeks, 1) - 1)
@@ -1772,9 +1773,9 @@ def stats(
                 "key": k,
                 "label": v,
                 "group": training.GROUP_OF[k],
-                "group_label": training.GROUP_LABELS[training.GROUP_OF[k]],
+                "group_label": training.group_labels(lang)[training.GROUP_OF[k]],
             }
-            for k, v in training.MUSCLES.items()
+            for k, v in training.muscles(lang).items()
         ],  # fmt: skip
         "progress_from": p_start,
         "e1rm": [
@@ -1863,9 +1864,10 @@ def muscle_state(conn: Connection, now: datetime) -> dict:
     garmin_h = None
     if garmin is not None:
         garmin_h = round(max(0.0, garmin.value / 60 - (now - garmin.ts).total_seconds() / 3600), 1)
+    labels = training.muscles(profile.lang(conn))
     return {
         "at": now,
-        "muscles": [{"key": k, "label": v, **state[k]} for k, v in training.MUSCLES.items()],
+        "muscles": [{"key": k, "label": v, **state[k]} for k, v in labels.items()],
         "garmin_recovery_h": garmin_h,
         "thresholds": {"ready": recovery.READY, "fatigued": recovery.FATIGUED},
     }
@@ -1888,9 +1890,10 @@ def get_muscle_state(
     out = muscle_state(conn, now)
     # the app up to 1.7.0 draws chest, shoulders and back as one muscle each: its most fatigued part
     by_key = {m["key"]: m for m in out["muscles"]}
+    groups = training.group_labels(profile.lang(conn))
     for old, parts in training.ALIASES.items():
         top = max((by_key[m] for m in parts), key=lambda m: m["fatigue"])
-        out["muscles"].append({**top, "key": old, "label": training.GROUP_LABELS[old], "alias": True})
+        out["muscles"].append({**top, "key": old, "label": groups[old], "alias": True})
     return out
 
 
@@ -1913,7 +1916,7 @@ def get_muscle_volume(weeks: int = Query(4, ge=1, le=52), conn: Connection = CON
                 "hard_sets": total.get(k, 0),
                 "per_week": round(total.get(k, 0) / weeks, 1),
             }
-            for k, v in training.MUSCLES.items()
+            for k, v in training.muscles(profile.lang(conn)).items()
         ],
     }
 
@@ -1948,7 +1951,8 @@ def get_muscles_of(
             out[m] = out.get(m, 0) + n
         for m in ex["muscles_secondary"]:
             out[m] = out.get(m, 0) + n * recovery.SECONDARY
-    return {"muscles": [{"key": k, "label": training.MUSCLES[k], "hard_sets": v} for k, v in out.items()]}
+    labels = training.muscles(profile.lang(conn))
+    return {"muscles": [{"key": k, "label": labels[k], "hard_sets": v} for k, v in out.items()]}
 
 
 # --- structural balance -----------------------------------------------------------------------------------
@@ -1990,7 +1994,7 @@ def balance(conn: Connection, weeks: int = 8, until: date | None = None) -> dict
     return {
         "weeks": weeks,
         "sets_per_week": {k: round(v, 1) for k, v in sets.items()},
-        **training.balance(sets, best),
+        **training.balance(sets, best, profile.lang(conn)),
     }
 
 

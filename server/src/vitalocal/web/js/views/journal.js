@@ -52,7 +52,7 @@ export async function journalView(ctx, requested, tab = "diary") {
   content.append(
     due.length ? h("div", { class: "notice accent", style: { marginBottom: "16px" } }, icon("calendar-stats"),
       h("span", { class: "grow" }, due.includes("month") ? t("Time for the monthly review.") : t("Time for the weekly review.")),
-      h("a", { class: "btn", href: "#/journal/reviews" }, t("Write review"))) : null,
+      h("a", { class: "btn", href: "#/journal/reviews" }, t("Write review"))) : "", // append() writes null as "null"
     h("div", { class: "grid-main" },
       h("div", { class: "stack" },
         card({ title: t("Journal"), icon: "pencil" }, editor.status, editor.node),

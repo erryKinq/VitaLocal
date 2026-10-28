@@ -12,7 +12,9 @@ import { ask, card, iconBtn, menu, sheet } from "./ui.js";
 
 export const MAIN = ["calories", "proteins", "carbohydrates", "fat"];
 const QUICK = ["calories", "fat", "carbohydrates", "proteins"]; // order of a nutrition label
-const SHORT = { calories: "kcal", proteins: "P", carbohydrates: "KH", fat: "F" };
+const SHORT_DE = { calories: "kcal", proteins: "P", carbohydrates: "KH", fat: "F" };
+const SHORT_EN = { ...SHORT_DE, carbohydrates: "C" };
+const short = (k) => (lang() === "de" ? SHORT_DE : SHORT_EN)[k];
 
 let catalogPromise = null;
 /** The nutrient catalog (key, unit, labels), loaded once. */
@@ -30,7 +32,7 @@ export function scaled(nutrients, factor) {
 
 const macroLine = (n) => [
   n.calories != null ? `${f.num(n.calories)} kcal` : "– kcal",
-  ...["fat", "carbohydrates", "proteins"].map((k) => `${SHORT[k]} ${n[k] == null ? "–" : f.num(n[k], n[k] < 10 ? 1 : 0)}`),
+  ...["fat", "carbohydrates", "proteins"].map((k) => `${short(k)} ${n[k] == null ? "–" : f.num(n[k], n[k] < 10 ? 1 : 0)}`),
 ].join(" · ");
 
 /** A clock time on `day` in the server's time zone, as an ISO timestamp. */
@@ -151,7 +153,7 @@ function mealBlock(day, m, meals, reload) {
     if (!breakdown.hidden) breakdown.replaceChildren(mealBreakdown(m.entries));
   };
   const tot = m.totals;
-  const macros = m.entries.length ? ["fat", "carbohydrates", "proteins"].map((k) => `${SHORT[k]} ${tot[k] == null ? "–" : f.num(tot[k])}`).join(" · ") : "";
+  const macros = m.entries.length ? ["fat", "carbohydrates", "proteins"].map((k) => `${short(k)} ${tot[k] == null ? "–" : f.num(tot[k])}`).join(" · ") : "";
   return h("div", { class: "meal-block" },
     h("div", { class: "meal-head" },
       h("div", { class: "meal-title" }, h("b", {}, m.name),
@@ -471,7 +473,7 @@ function selection({ day, mealIndex, meals, onDone, onChange }) {
 function quickForm({ day, mealIndex, meals, onSaved, onCancel }) {
   const name = h("input", { type: "text", placeholder: t("What, e.g. cake at work"), required: true, maxlength: 200 });
   const nums = Object.fromEntries(QUICK.map((k) => [k, h("input", { type: "number", class: "num-input", min: 0, step: "any",
-    placeholder: k === "calories" ? "kcal" : `${SHORT[k]} g` })]));
+    placeholder: k === "calories" ? "kcal" : `${short(k)} g` })]));
   const meal = mealSelect(meals, mealIndex);
   const time = h("input", { type: "time", value: day === todayIso() ? nowHHMM() : "12:00" });
   const status = h("span", { class: "small muted" });

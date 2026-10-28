@@ -22,7 +22,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import Connection, text
 
-from vitalocal import labs
+from vitalocal import labs, profile
 from vitalocal.api.days import _tz
 from vitalocal.db import CONN
 from vitalocal.deps import get_store
@@ -333,6 +333,7 @@ def _trend(latest: float | None, prev: float | None) -> str | None:
 def overview(conn: Connection, until: date | None = None, key: str | None = None) -> dict:
     """One row per analyte (uncatalogued values: per printed name) with every value over time."""
     m, s, targets = analytes(conn), load_settings(conn), _targets(conn)
+    lang = profile.lang(conn)
     rows = conn.execute(
         text("""SELECT v.*, r.collected_on, r.lab FROM lab_value v JOIN lab_report r ON r.id = v.report_id
                 WHERE (CAST(:u AS date) IS NULL OR r.collected_on <= :u)
@@ -349,7 +350,7 @@ def overview(conn: Connection, until: date | None = None, key: str | None = None
         g = groups.setdefault(gkey, {
             "key": gkey,
             "analyte_key": a.key if a else None,
-            "label": a.label if a else d["name"],
+            "label": labs.label(a, lang) if a else d["name"],
             "group": a.group if a else "other",
             "custom": a.custom if a else None,
             "unit": display_unit(a, s) if a else d["unit"],
@@ -400,7 +401,7 @@ def overview(conn: Connection, until: date | None = None, key: str | None = None
     order = {k: i for i, (k, _) in enumerate(labs.GROUPS)}
     out.sort(key=lambda g: (order.get(g["group"], 99), g["label"].lower()))
     grouped = []
-    for gk, label in labs.GROUPS:
+    for gk, label in labs.group_labels(lang).items():
         rows_ = [g for g in out if g["group"] == gk]
         if rows_:
             grouped.append({"key": gk, "label": label, "rows": rows_})
@@ -547,13 +548,14 @@ def lab_facts(conn: Connection, day: date, new_days: int = 14, detail: bool = Fa
 def get_catalog(conn: Connection = CONN) -> dict:
     """Analytes with units, synonyms and related supplement ingredients, plus learned synonyms."""
     m, s, targets = analytes(conn), load_settings(conn), _targets(conn)
+    lang = profile.lang(conn)
     return {
-        "groups": [{"key": k, "label": label} for k, label in labs.GROUPS],
+        "groups": [{"key": k, "label": label} for k, label in labs.group_labels(lang).items()],
         "materials": list(labs.MATERIALS),
         "analytes": [
             {
                 "key": a.key,
-                "label": a.label,
+                "label": labs.label(a, lang),
                 "group": a.group,
                 "unit": a.unit,
                 "conventional_unit": a.conventional,
@@ -561,7 +563,8 @@ def get_catalog(conn: Connection = CONN) -> dict:
                 "display_unit": display_unit(a, s),
                 "material": a.material,
                 "molar_mass": a.molar_mass,
-                "synonyms": list(a.synonyms),
+                # the German name stays findable under an English label
+                "synonyms": list(a.synonyms) + ([a.label] if labs.label(a, lang) != a.label else []),
                 "ingredients": list(a.ingredients),
                 "note": a.note,
                 "custom": a.custom,

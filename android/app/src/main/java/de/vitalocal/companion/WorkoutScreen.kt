@@ -224,7 +224,7 @@ fun StartWorkoutCard(catalog: WorkoutCatalog) {
     VCard(tr("Training ohne Uhr"), R.drawable.ic_t_player_play, tint = Vita.colors.train) {
         Muted(tr("Sätze und Wiederholungen direkt hier erfassen; die Ziele kommen aus deinem Plan."))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (next != null) Button(onClick = { start(next) }) { Text("${next.optString("name")} starten") }
+            if (next != null) Button(onClick = { start(next) }) { Text(tr("{0} starten", next.optString("name"))) }
             Column {
                 OutlinedButton(onClick = { menu = true }) { Text(if (next != null) tr("Anderes …") else tr("Starten …")) }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {

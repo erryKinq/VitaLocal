@@ -171,7 +171,7 @@ fun UpdateBanner(showUpToDate: Boolean = false) {
 
 // --- To do: habits and supplements ----------------------------------------------------------
 
-private val FORMS = mapOf("capsule" to tr("Kapseln"), "tablet" to tr("Tabletten"), "drops" to tr("Tropfen"), "powder" to tr("Portionen"), "other" to tr("Einheiten"))
+private val FORMS = mapOf("capsule" to tr("Kapseln"), "tablet" to tr("Tabletten"), "drops" to tr("Tropfen"), "powder" to tr("Portion(en)"), "other" to tr("Einheiten"))
 
 /** Open habits (to tick or count; automatic ones are on the habits tab) and supplements; what is done folds away below. */
 @Composable
@@ -213,7 +213,7 @@ internal fun HabitRow(h: Habit, day: String) {
         Column(Modifier.weight(1f)) {
             Text(h.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
             val sub = listOfNotNull(
-                if (h.streak > 0) tr("{0} {1} in Folge", h.streak, if (h.streakUnit == "weeks") tr("Wo.") else "T.") else null,
+                if (h.streak > 0) tr("{0} {1} in Folge", h.streak, if (h.streakUnit == "weeks") tr("Wo.") else tr("T.")) else null,
                 if (h.jokers > 0) tr("{0} Joker", h.jokers) else null, if (h.hard) tr("schwer ×2") else null,
             ).joinToString(" · ")
             if (sub.isNotEmpty()) Row(verticalAlignment = Alignment.CenterVertically) {

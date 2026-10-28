@@ -1160,7 +1160,10 @@ const DE = {
   "Keep the current target; this suggestion is not offered again": "Aktuelles Ziel behalten; dieser Vorschlag wird nicht wieder angeboten",
 };
 
-const DICTS = { de: DE, en: {} };
+// English wording where the source text is only a unique key ("Light" alone is also the theme)
+const EN = { "Light sleep stage": "Light" };
+
+const DICTS = { de: DE, en: EN };
 
 function initial() {
   try {
