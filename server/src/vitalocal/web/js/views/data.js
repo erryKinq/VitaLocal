@@ -73,7 +73,61 @@ export function appCard() {
         t("Installing needs \"Install unknown apps\" for the browser once. Updates install over the existing app."),
         h("div", { class: "num", title: "SHA-256" }, `SHA-256 ${app.sha256.slice(0, 16)}…`)));
   }).catch((e) => body.replaceChildren(h("div", { class: "error" }, e.message)));
-  return h("div", { class: "stack" }, card({ title: t("Android app"), icon: "device-mobile" }, null, body), apkUploadCard());
+  return h("div", { class: "stack" }, card({ title: t("Android app"), icon: "device-mobile" }, null, body),
+    githubUpdatesCard(), apkUploadCard());
+}
+
+/** The server fetches new APKs from the GitHub releases itself (on by default, opt-out; while off it
+ * makes no requests to GitHub). */
+function githubUpdatesCard() {
+  const body = h("div", { class: "muted small" }, t("Loading …"));
+  const result = (cfg) => {
+    const r = cfg.last_result;
+    if (!cfg.last_check_at || !r) return h("span", { class: "muted" }, t("Not checked yet."));
+    const when = h("span", { class: "muted" }, `${f.dateTime(cfg.last_check_at)} · `);
+    const ver = { version: r.version, code: r.version_code, release: r.release || "–" };
+    const [badge, cls, text] = r.status === "updated" ? [t("updated"), "ok", t("Published version {version} ({code}) from {release}.", ver)]
+      : r.status === "up_to_date" ? [t("up to date"), "ok", t("Latest release {release} has version {version} ({code}); nothing newer.", ver)]
+      : r.status === "no_apk" ? [t("no APK"), "warn", t("The latest release {release} has no APK.", ver)]
+      : [t("failed"), "warn", r.message || ""];
+    return h("span", {}, when, h("span", { class: `badge ${cls}` }, badge), " ", text,
+      r.url ? h("span", {}, " ", h("a", { href: r.url, target: "_blank", rel: "noopener" }, t("Release ↗"))) : null);
+  };
+  const draw = (cfg) => {
+    const enabled = h("input", { type: "checkbox", checked: cfg.enabled });
+    const repo = h("input", { type: "text", value: cfg.repo, class: "wide", pattern: "[A-Za-z0-9_.\\-]+/[A-Za-z0-9_.\\-]+", required: true });
+    const status = h("span", { class: "small muted" });
+    const last = h("div", { class: "small" }, result(cfg));
+    const checkBtn = h("button", { type: "button", disabled: !cfg.enabled }, t("Check now"));
+    const save = async (e) => {
+      e.preventDefault();
+      status.textContent = t("Saving …");
+      try {
+        draw(await api("/api/v1/app/android/github", { method: "PUT", json: { enabled: enabled.checked, repo: repo.value.trim() } }));
+      } catch (err) {
+        status.textContent = t("Not saved: {msg}", { msg: err.message });
+      }
+    };
+    checkBtn.onclick = async () => {
+      checkBtn.disabled = true;
+      status.textContent = t("Checking …");
+      try {
+        draw(await api("/api/v1/app/android/github/check", { method: "POST" }));
+      } catch (err) {
+        status.textContent = err.message;
+        checkBtn.disabled = false;
+      }
+    };
+    body.replaceChildren(
+      h("p", { class: "small muted" }, t("When switched on, the server checks the latest release of this GitHub repository once a day. A newer APK is downloaded, checked against its SHA-256 file and published here; installed apps then update themselves. Switched off, the server makes no requests to GitHub.")),
+      h("form", { class: "form", onsubmit: save },
+        h("label", { class: "form-check" }, enabled, ` ${t("Updates from GitHub releases")}`),
+        h("label", { class: "form-row" }, h("span", {}, t("Repository (owner/name)")), repo),
+        h("div", { class: "toolbar" }, h("button", { class: "primary", type: "submit" }, t("Save")), checkBtn, status)),
+      h("div", { class: "form-row", style: { marginTop: "8px" } }, h("span", { class: "small muted" }, t("Last check")), last));
+  };
+  api("/api/v1/app/android/github").then(draw).catch((e) => body.replaceChildren(h("div", { class: "error" }, e.message)));
+  return card({ title: t("Updates from GitHub"), icon: "refresh" }, null, body);
 }
 
 /** Publish an APK (e.g. from a VitaLocal release) here; installed apps update to it. Version and

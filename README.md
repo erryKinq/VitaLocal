@@ -112,9 +112,15 @@ API keys are stored encrypted.
 ## Android app
 
 Every [release](https://github.com/erryKinq/VitaLocal/releases) carries the signed APK
-(`VitaLocal-<version>-<code>.apk`). Upload it once under Settings → Android app on your server (or
-download it there on the phone); installed apps update themselves from your server. In the app enter the
-server address and the API token. Building it yourself: [android/README.md](android/README.md)
+(`VitaLocal-<version>-<code>.apk`). Your server fetches it on its own: under Settings → Android app,
+**Updates from GitHub releases** is on by default and checks the latest release of
+`erryKinq/VitaLocal` once a day (or on "Check now"). An APK with a higher version code than the
+published one is downloaded, verified against the release's `.sha256` file and published on your
+server; installed apps then update themselves from there. The card shows the last check and its
+result. Switch it off (or point it at your fork's repository) if you publish builds yourself; while
+off, the server makes no requests to GitHub. Without it, upload the APK of a release on the same
+page. In the app enter the server address and the API token; you can also download the APK there on
+the phone for the first install. Building it yourself: [android/README.md](android/README.md)
 (note: updates only install over an app signed with the same key).
 
 ## Watch app (Garmin, optional)

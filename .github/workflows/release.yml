@@ -126,8 +126,9 @@ jobs:
           Set \`VITALOCAL_IMAGE\` in \`.env\`, then \`docker compose pull && docker compose up -d\`;
           migrations run on start.
 
-          **Android app:** \`$APK\`. Upload it on your server under Settings → Android app; installed
-          apps update from there.
+          **Android app:** \`$APK\`. Servers fetch it on their own within a day (Settings → Android app →
+          Updates from GitHub releases, on by default) or take it as an upload there; installed apps
+          update from your server.
           EOF
       - uses: softprops/action-gh-release@v3
         with:

@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
-from vitalocal import __version__
+from vitalocal import __version__, app_updates
 from vitalocal.api import (
     ai,
     coach,
@@ -50,9 +50,12 @@ async def lifespan(_app: FastAPI):
     # Imports run one at a time in the background (see ingest/worker.py).
     if get_settings().ingest_worker:
         worker.start(get_engine(), get_store())
+    # APK updates from GitHub releases (opt-out); no network while switched off
+    app_updates.start()
     try:
         yield
     finally:
+        app_updates.stop()
         worker.stop()
 
 

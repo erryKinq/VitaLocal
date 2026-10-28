@@ -57,7 +57,22 @@ No auth. `200 {"status":"ok","version":…,"database":"ok","raw_store":"ok"}`, o
 - `GET /api/v1/app/android/apk`: the APK itself (needs the token; the WebUI's Data page fetches
   it and saves it as `VitaLocal-<version>.apk`).
 - `PUT /api/v1/app/android` (multipart: `file`, `version`, `version_code`): publish a build,
-  replacing the previous one. Used by `android/publish.sh`.
+  replacing the previous one. Used by `android/publish.sh`. `409` while an update is being
+  downloaded from GitHub.
+- `GET /api/v1/app/android/github`: updates from GitHub releases: `enabled` (default `true`),
+  `repo` (default `erryKinq/VitaLocal`), `last_check_at` and `last_result` (`null` before the first
+  check). `last_result.status` is `updated` (a newer APK was published), `up_to_date`, `no_apk`
+  (the latest release has none) or `error` (`message` says why: GitHub unreachable, rate limit,
+  missing or mismatching `.sha256`, not an APK); with `repo`, `release` (tag), `url`, `version`
+  and `version_code` of the release's APK where known. Published APKs carry `"source": "github"`
+  in `GET /api/v1/app/android` (uploads: `"upload"`).
+- `PUT /api/v1/app/android/github` `{"enabled": bool, "repo": "owner/name"}`: switch it on or off;
+  another repository clears the last result. While off the server makes no requests to GitHub.
+  While on it checks the latest (non-prerelease) release once a day: the asset
+  `VitaLocal-<version>-<versionCode>.apk` is published when its version code is higher than the
+  current APK's and its SHA-256 matches `<asset>.sha256`.
+- `POST /api/v1/app/android/github/check`: check now; returns the same as `GET` with the new
+  result. `409` while switched off.
 
 ### `GET /api/v1/capabilities`
 What the clients should offer: `ai` (`configured`, `external`, `vision`, `features` with
