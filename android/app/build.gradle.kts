@@ -20,8 +20,8 @@ android {
         applicationId = "de.vitalocal.companion"
         minSdk = 29
         targetSdk = 36
-        versionCode = 38
-        versionName = "1.9.1"
+        versionCode = 39
+        versionName = "1.9.2"
         // zxing-cpp ships native code for every ABI; the phone (and the emulator) are arm64
         ndk { abiFilters += listOf("arm64-v8a") }
     }
