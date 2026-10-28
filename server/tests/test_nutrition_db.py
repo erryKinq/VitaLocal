@@ -3,6 +3,7 @@ and the Open Food Facts client (mocked, no network)."""
 
 import json
 import uuid
+from datetime import datetime
 
 import httpx
 import pytest
@@ -112,7 +113,9 @@ def test_catalog_entries_and_daily_totals(client):
     for created in (1, 0):
         r = client.post("/api/v1/nutrition/copy", headers=AUTH, json=body)
         assert r.status_code == 200 and r.json()["created"] == created
-    assert r.json()["entries"][0]["logged_at"] == "2026-10-02T09:00:00+02:00"  # same time of day
+    # same time of day (compared as an instant: the offset follows the database's time zone)
+    copied = datetime.fromisoformat(r.json()["entries"][0]["logged_at"])
+    assert copied == datetime.fromisoformat("2026-10-02T09:00:00+02:00")
     assert _trend(client, "nutrition.energy", "2026-10-02", "2026-10-02") == {"2026-10-02": 185}
 
     # used foods are archived, unused ones deleted
