@@ -31,7 +31,7 @@ jobs:
       VITALOCAL_TEST_DATABASE_URL: postgresql+psycopg://vitalocal:vitalocal@localhost:5432/vitalocal_test
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.3  # publishes no major tag
         with:
           python-version: "3.12"  # as in the image
       - run: uv sync --frozen
