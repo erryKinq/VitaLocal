@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_label">An VitaLocal senden</string>
+    <string name="widget_description">Wasser und offene Gewohnheiten von heute</string>
+    <string name="garden_widget_description">Dein Gewohnheiten-Garten: eine Pflanze pro Gewohnheit</string>
+    <string name="flame_widget_description">Flammen, Level und beste Serie</string>
+    <string name="tile_label">+250 ml Wasser</string>
+    <string name="widget_today">VitaLocal Heute</string>
+    <string name="widget_garden">VitaLocal Garten</string>
+    <string name="widget_flames">VitaLocal Flammen</string>
+</resources>

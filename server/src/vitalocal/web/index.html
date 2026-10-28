@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0f766e">
+  <title>VitaLocal</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="app.css">
+  <script>
+    // apply the saved theme before first paint (no flash); "system" = no attribute
+    try { const th = localStorage.getItem("vitalocal.theme"); if (th === "light" || th === "dark") document.documentElement.dataset.theme = th; } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/"><img src="icon.svg" alt="" width="22" height="22"> <span>VitaLocal</span></a>
+    <nav id="nav" aria-label="Main"></nav>
+    <div class="settings" id="settings"></div>
+  </header>
+  <main id="app" aria-live="polite"></main>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VitaLocal</string>
+    <string name="share_label">Send to VitaLocal</string>
+    <string name="widget_description">Water and open habits of today</string>
+    <string name="garden_widget_description">Your habit garden: one plant per habit</string>
+    <string name="flame_widget_description">Flames, level and best streak</string>
+    <string name="tile_label">+250 ml water</string>
+    <string name="widget_today">VitaLocal Today</string>
+    <string name="widget_garden">VitaLocal Garden</string>
+    <string name="widget_flames">VitaLocal Flames</string>
+</resources>

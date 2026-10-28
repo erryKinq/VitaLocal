@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The habit garden: one plant per habit (up to 8), the ones that need water first. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/g_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/g_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="4dp"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+        <TextView android:id="@+id/g_plant1" style="@style/WidgetPlant" />
+        <TextView android:id="@+id/g_plant2" style="@style/WidgetPlant" />
+        <TextView android:id="@+id/g_plant3" style="@style/WidgetPlant" />
+        <TextView android:id="@+id/g_plant4" style="@style/WidgetPlant" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/g_row2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+        <TextView android:id="@+id/g_plant5" style="@style/WidgetPlant" />
+        <TextView android:id="@+id/g_plant6" style="@style/WidgetPlant" />
+        <TextView android:id="@+id/g_plant7" style="@style/WidgetPlant" />
+        <TextView android:id="@+id/g_plant8" style="@style/WidgetPlant" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/g_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="#CCFBF1"
+        android:textSize="11sp" />
+</LinearLayout>

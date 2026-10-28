@@ -1,0 +1,49 @@
+services:
+  db:
+    # pinned: a newer TimescaleDB needs `ALTER EXTENSION timescaledb UPDATE` after the switch
+    image: timescale/timescaledb:2.31.0-pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vitalocal
+      POSTGRES_USER: vitalocal
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vitalocal -d vitalocal"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    # VITALOCAL_IMAGE set: a published image (`docker compose pull`); otherwise built from ./server
+    image: ${VITALOCAL_IMAGE:-vitalocal-api:local}
+    build: ./server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      VITALOCAL_DATABASE_URL: postgresql+psycopg://vitalocal:${POSTGRES_PASSWORD}@db:5432/vitalocal
+      VITALOCAL_API_TOKEN: ${VITALOCAL_API_TOKEN:?set VITALOCAL_API_TOKEN in .env}
+      VITALOCAL_RAW_STORE_PATH: /data/raw_store
+      VITALOCAL_RAW_RETENTION_DAYS: ${VITALOCAL_RAW_RETENTION_DAYS:-7}
+      # Open Food Facts lookups (barcode, search): contact for the User-Agent, switch
+      VITALOCAL_OFF_CONTACT: ${VITALOCAL_OFF_CONTACT:-}
+      VITALOCAL_OFF_ENABLED: ${VITALOCAL_OFF_ENABLED:-true}
+      VITALOCAL_TIMEZONE: ${VITALOCAL_TIMEZONE:-Europe/Berlin}
+      VITALOCAL_OFF_COUNTRY: ${VITALOCAL_OFF_COUNTRY-germany}
+      # optional AI defaults (editable in the WebUI; there they win)
+      VITALOCAL_AI_BASE_URL: ${VITALOCAL_AI_BASE_URL:-}
+      VITALOCAL_AI_MODEL: ${VITALOCAL_AI_MODEL:-}
+      VITALOCAL_AI_API_KEY: ${VITALOCAL_AI_API_KEY:-}
+      # key for stored secrets (AI API key); unset: generated in the raw_store volume
+      VITALOCAL_SECRET_KEY: ${VITALOCAL_SECRET_KEY:-}
+    volumes:
+      - raw_store:/data/raw_store
+    ports:
+      - "${VITALOCAL_BIND:-127.0.0.1}:${VITALOCAL_PORT:-8000}:8000"
+
+volumes:
+  pgdata:
+  raw_store:

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One row (e.g. 4x1): today's drinks and three quick amounts. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="12dp">
+
+    <TextView
+        android:id="@+id/w_water"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxLines="2"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp" />
+
+        <TextView android:id="@+id/w_add_200" style="@style/WidgetDrinkButton" android:text="+200" />
+        <TextView android:id="@+id/w_add_250" style="@style/WidgetDrinkButton" android:text="+250" />
+        <TextView android:id="@+id/w_add_300" style="@style/WidgetDrinkButton" android:text="+300" />
+</LinearLayout>
